@@ -3,15 +3,16 @@ import json
 import uuid
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from khoj.utils.helpers import to_snake_case_from_dash
 
 
 class ConfigBase(BaseModel):
-    class Config:
-        alias_generator = to_snake_case_from_dash
-        populate_by_name = True
+    model_config = ConfigDict(
+        alias_generator=to_snake_case_from_dash,
+        populate_by_name=True
+    )
 
     def __getitem__(self, item):
         return getattr(self, item)

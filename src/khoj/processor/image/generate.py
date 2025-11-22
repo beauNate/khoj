@@ -117,7 +117,7 @@ async def text_to_image(
                 webp_image_bytes = generate_image_with_google(
                     image_prompt, text_to_image_config, text2image_model, image_shape
                 )
-        except openai.OpenAIError or openai.BadRequestError or openai.APIConnectionError as e:
+        except (openai.OpenAIError, openai.BadRequestError, openai.APIConnectionError) as e:
             error_message = str(e)
             if "content_policy_violation" in error_message or (hasattr(e, "code") and e.code == "content_policy_violation"):
                 logger.error(f"Image Generation blocked by OpenAI: {e}")

@@ -117,8 +117,9 @@ async def text_to_image(
                 webp_image_bytes = generate_image_with_google(
                     image_prompt, text_to_image_config, text2image_model, image_shape
                 )
-        except openai.OpenAIError or openai.BadRequestError or openai.APIConnectionError as e:
-            if "content_policy_violation" in e.message:
+        except (openai.OpenAIError, openai.BadRequestError, openai.APIConnectionError) as e:
+            error_message = str(e)
+            if "content_policy_violation" in error_message or (hasattr(e, "code") and e.code == "content_policy_violation"):
                 logger.error(f"Image Generation blocked by OpenAI: {e}")
                 status_code = e.status_code  # type: ignore
                 message = "Image generation blocked by OpenAI due to policy violation"  # type: ignore
@@ -176,6 +177,7 @@ def generate_image_with_openai(
 
     # Get the API config from the user's configuration
     api_key = None
+    openai_client: openai.OpenAI
     if text_to_image_config.api_key:
         api_key = text_to_image_config.api_key
         openai_client = openai.OpenAI(api_key=api_key)
@@ -196,7 +198,7 @@ def generate_image_with_openai(
 
     # Generate image using OpenAI API
     OPENAI_IMAGE_GEN_STYLE = "vivid"
-    response = openai_client.images.generate(
+    response = openai_client.images.generate(  # type: ignore[call-overload]
         prompt=improved_image_prompt,
         model=text2image_model,
         style=OPENAI_IMAGE_GEN_STYLE,

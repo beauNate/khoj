@@ -59,11 +59,11 @@ class MCPClient:
 
         # Process result content based on its type
         if len(result.content) > 0 and isinstance(result.content[0], TextContent):
-            return [item.text for item in result.content]
+            return [item.text for item in result.content if isinstance(item, TextContent)]
         elif len(result.content) > 0 and isinstance(result.content[0], AudioContent):
-            return [{"data": item.data, "format": item.mimeType} for item in result.content]
+            return [{"data": item.data, "format": item.mimeType} for item in result.content if isinstance(item, AudioContent)]
         elif len(result.content) > 0 and isinstance(result.content[0], ImageContent):
-            return [{"data": item.data, "format": item.mimeType} for item in result.content]
+            return [{"data": item.data, "format": item.mimeType} for item in result.content if isinstance(item, ImageContent)]
         return result.content
 
     async def _connect_to_sse_server(self):
